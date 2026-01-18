@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>FILLER 4.0 (Beta + Preview)</title>
+
+    <script src="https://unpkg.com/pizzip@3.1.8/dist/pizzip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://unpkg.com/docx-preview/dist/docx-preview.js"></script>
+
+    <style>
+        :root {
+            --accent: #00695c;
+            --bg: #fafbfc;
+            --fg: #222;
+            --border: #e0e0e0;
+            --radius: 8px;
+        }
+        body {
+            font-family: system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            margin: 32px auto;
+            max-width: 900px;
+            line-height: 1.6;
+        }
+        h2 {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 0.5em;
+            font-weight: 600;
+        }
+        fieldset {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: #fff;
+            padding: 1.5em;
+            margin-bottom: 1.5em;
+            box-shadow: none;
+        }
+        legend {
+            font-weight: 600;
+            color: var(--accent);
+            padding: 0 0.5em;
+        }
+        label {
+            font-size: 1em;
+            font-weight: 500;
+            margin-bottom: 0.25em;
+            display: block;
+        }
+        input, select {
+            width: 100%;
+            padding: 0.6em;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: #fafbfc;
+            font-size: 1em;
+            margin-bottom: 1em;
+            box-sizing: border-box;
+        }
+        button {
+            border: none;
+            border-radius: var(--radius);
+            padding: 0.7em 1.2em;
+            font-size: 1em;
+            font-weight: 500;
+            background: var(--accent);
+            color: #fff;
+            cursor: pointer;
+            margin-right: 0.5em;
+            margin-bottom: 0.5em;
+            transition: background 0.2s;
+        }
+        button:active { opacity: 0.9; }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        pre {
+            background: #f5f5f5;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1em;
+            font-family: ui-monospace, monospace;
+            font-size: 0.98em;
+            overflow-x: auto;
+            max-height: 200px;
+        }
+        .small {
+            font-size: 0.92em;
+            color: #666;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid var(--border);
+            margin: 1.5em 0;
+        }
+        .hidden { display: none; }
+
+        /* --- ESTILOS DE LA TABLA DINÁMICA --- */
+        .table-wrapper {
+            overflow-x: auto;
+            width: 100%;
+            padding-bottom: 8px;
+            border: 1px dashed var(--border);
+            border-radius: var(--radius);
+        }
+        #tabla-dinamica {
+            table-layout: auto;
+            width: max-content;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+        #tabla-dinamica th, #tabla-dinamica td {
+            border: 1px solid var(--border);
+            padding: 4px 8px;
+            text-align: left;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+        #tabla-dinamica th {
+            background-color: #e0e0e0;
+            color: var(--fg);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+        }
+        #tabla-dinamica input {
+            padding: 5px;
+            margin-bottom: 0;
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 4px;
+        }
+        .iconbtn {
+            padding: 0.4em 0.6em;
+            line-height: 1;
+            margin: 0;
+            display: inline-block;
+            text-align: center;
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+        .iconbtn-delete {
+            background: #d32f2f;
+            color: white;
+        }
+        .iconbtn-delete:hover { background: #c62828; }
+        .iconbtn-preview {
+            background: #0288d1;
+            color: white;
+        }
+        .iconbtn-preview:hover { background: #0277bd; }
+
+        #tabla-dinamica th:last-child, #tabla-dinamica td:last-child { width: 90px; }
+        input[type="date"] { font-size: 0.9em; }
+
+        /* --- MODO "UN SOLO REGISTRO" (VERTICAL) --- */
+        .table-wrapper.single-record-mode { border-style: solid; }
+        .table-wrapper.single-record-mode #tabla-dinamica { width: 100%; }
+        .table-wrapper.single-record-mode thead { display: none; }
+        .table-wrapper.single-record-mode tbody tr { display: block; }
+        .table-wrapper.single-record-mode tbody tr td {
+            display: block;
+            border: none;
+            padding: 6px 8px 10px;
+            white-space: normal;
+        }
+        .table-wrapper.single-record-mode tbody tr td:last-child {
+            border-top: 1px solid var(--border);
+            margin-top: 4px;
+            padding-top: 8px;
+        }
+        .table-wrapper.single-record-mode .dyn-label {
+            display: block;
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-bottom: 2px;
+            color: #444;
+        }
+        .table-wrapper:not(.single-record-mode) .dyn-label { display: none; }
+        .table-wrapper.single-record-mode #tabla-dinamica th:last-child,
+        .table-wrapper.single-record-mode #tabla-dinamica td:last-child { width: auto; }
+
+        /* --- ESTILOS DEL MODAL DE PREVISUALIZACIÓN --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(2px);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 2% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: var(--radius);
+            width: 90%;
+            height: 90%;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .close-btn {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 0.8;
+        }
+        .close-btn:hover, .close-btn:focus { color: black; }
+        #preview-container {
+            flex-grow: 1;
+            overflow: auto;
+            border: 1px solid #ddd;
+            background: #e9e9e9;
+            padding: 20px;
+        }
+        .docx-wrapper {
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            padding: 0 !important;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <h2>FILLER 4.0 (Beta + Preview)</h2>
+
+    <div>
+        <label>1) Selecciona tu plantilla <small>(.docx)</small></label>
+        <input id="fileInput" type="file" accept=".docx" />
+        <div class="small">
+            Usa marcadores como <code>{{DEMANDANTE}}</code>, <code>{{RADICADO}}</code> o
+            <code>{{sentencia.consecutivo}}</code>.
+        </div>
+    </div>
+
+    <hr />
+
+    <div id="formArea"></div>
+
+    <hr />
+
+    <div style="margin-top: 12px">
+        <button id="generateBtn" disabled onclick="generateAndDownloadPDF()">Generar y descargar PDF</button>
+        <button id="generateDocxBtn" disabled onclick="generateAndDownload()">Descargar DOCX</button>
+        <button id="reloadBtn" class="hidden">Cargar otra plantilla</button>
+    </div>
+
+    <h3>Registro de Eventos y Errores:</h3>
+    <pre id="log" aria-live="polite"></pre>
+
+    <div id="previewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="margin:0">Previsualización del Documento</h3>
+                <span class="close-btn" onclick="cerrarPreview()">&times;</span>
+            </div>
+            <div id="preview-container">
+                <p style="text-align:center; color:#666;">Cargando vista previa...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            // ✅ CAMBIA ESTA URL SOLO SI TU RENDER ES DIFERENTE
+            const BACKEND_URL = "https://d-filler.onrender.com";
+
+            const fileInput = document.getElementById("fileInput");
+            const formArea = document.getElementById("formArea");
+            const generateBtn = document.getElementById("generateBtn");
+            const generateDocxBtn = document.getElementById("generateDocxBtn");
+            const reloadBtn = document.getElementById("reloadBtn");
+            const logEl = document.getElementById("log");
+            const previewModal = document.getElementById("previewModal");
+            const previewContainer = document.getElementById("preview-container");
+
+            let originalZip = null;
+            let templateFilename = null;
+            let detectedVars = [];
+
+            const TBODY_ID = "cuerpo-registros-dinamicos";
+            const TABLE_CONTAINER_ID = "tableContainer";
+
+            // ==========================================================
+            // ✅ PROTECCIÓN CONTRA CIERRE/RECARGA SIN ADVERTENCIA
+            // ==========================================================
+            let hasUnsavedChanges = false;
+            const markDirty = () => { hasUnsavedChanges = true; };
+            const markClean = () => { hasUnsavedChanges = false; };
+
+            window.addEventListener("beforeunload", function (e) {
+                if (!hasUnsavedChanges) return;
+                e.preventDefault();
+                e.returnValue = "";
+            });
+
+            document.addEventListener("input", function (e) {
+                const el = e.target;
+                if (el && el.matches && el.matches(`#${TABLE_CONTAINER_ID} input`)) {
+                    markDirty();
+                }
+            });
+            // ==========================================================
+
+            fileInput.addEventListener('change', handleFileSelect, false);
+
+            reloadBtn.addEventListener('click', () => {
+                if (hasUnsavedChanges) {
+                    const ok = confirm("Vas a recargar y perder cambios no guardados. ¿Seguro?");
+                    if (!ok) return;
+                }
+                location.reload();
+            });
+
+            window.onclick = function(event) {
+                if (event.target == previewModal) {
+                    cerrarPreview();
+                }
+            }
+
+            function handleFileSelect(evt) {
+                const f = evt.target.files[0];
+                if (!f) return;
+                templateFilename = f.name;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const data = e.target.result;
+                    try {
+                        const zip = new PizZip(data);
+                        originalZip = zip;
+                        const vars = extractVarsFromZip(zip);
+                        log(`✅ Plantilla cargada. ${vars.length} variables detectadas.`);
+                        buildForm(vars);
+                        markClean();
+                    } catch (err) {
+                        log("❌ Error al leer el archivo DOCX. Asegúrate de que es un .docx válido sin contraseña.");
+                        console.error(err);
+                    }
+                };
+                reader.readAsBinaryString(f);
+            }
+
+            function updateLayoutMode() {
+                const wrapper = document.getElementById(TABLE_CONTAINER_ID);
+                const tbody = document.getElementById(TBODY_ID);
+                if (!wrapper || !tbody) return;
+
+                const rows = tbody.querySelectorAll('tr.fila-registro-dinamica');
+                if (rows.length <= 1) wrapper.classList.add('single-record-mode');
+                else wrapper.classList.remove('single-record-mode');
+            }
+
+            function construirFila(vars, esModelo = false) {
+                const tr = document.createElement('tr');
+                tr.className = "fila-registro-dinamica";
+
+                vars.forEach(v => {
+                    const td = document.createElement('td');
+                    const lower = v.toLowerCase();
+                    let inp;
+
+                    if (lower.includes("fecha") && !lower.includes("fechas")) {
+                        inp = document.createElement("input");
+                        inp.type = "date";
+                    } else if (v.includes('.')) {
+                        inp = document.createElement("input");
+                        inp.type = "text";
+                        inp.placeholder = "Valor para " + v;
+                        inp.style.backgroundColor = '#fff3e0';
+                    } else {
+                        inp = document.createElement("input");
+                        inp.type = "text";
+                        if (esModelo) inp.placeholder = "Valor para " + v;
+                    }
+
+                    inp.name = v;
+
+                    const labelDiv = document.createElement('div');
+                    labelDiv.className = 'dyn-label';
+                    labelDiv.textContent = v;
+
+                    td.appendChild(labelDiv);
+                    td.appendChild(inp);
+                    tr.appendChild(td);
+                });
+
+                const tdAccion = document.createElement('td');
+                const divAccion = document.createElement('div');
+                divAccion.className = 'action-cell';
+
+                const btnPreview = document.createElement('button');
+                btnPreview.textContent = '👁️';
+                btnPreview.title = 'Previsualizar este documento';
+                btnPreview.className = 'iconbtn iconbtn-preview';
+                btnPreview.onclick = () => previsualizarFila(btnPreview);
+
+                const btnEliminar = document.createElement('button');
+                btnEliminar.textContent = '🗑️';
+                btnEliminar.title = 'Eliminar fila';
+                btnEliminar.className = 'iconbtn iconbtn-delete';
+                btnEliminar.onclick = () => eliminarFila(btnEliminar);
+
+                divAccion.appendChild(btnPreview);
+                divAccion.appendChild(btnEliminar);
+                tdAccion.appendChild(divAccion);
+                tr.appendChild(tdAccion);
+
+                return tr;
+            }
+
+            window.agregarFila = function() {
+                const cuerpoTabla = document.getElementById(TBODY_ID);
+                if (!cuerpoTabla) return;
+                const nuevaFila = construirFila(detectedVars, true);
+                cuerpoTabla.appendChild(nuevaFila);
+                updateLayoutMode();
+                markDirty();
+            }
+
+            window.eliminarFila = function(btnElement) {
+                const row = btnElement.closest('tr');
+                const tbody = document.getElementById(TBODY_ID);
+                if (tbody && tbody.querySelectorAll('tr').length > 1) {
+                    row.remove();
+                } else {
+                    if(row) {
+                        row.querySelectorAll('input').forEach(input => {
+                            input.value = input.type === 'date' ? '' : (input.type === 'number' ? '0' : '');
+                        });
+                    }
+                }
+                updateLayoutMode();
+                markDirty();
+            }
+
+            window.previsualizarFila = function(btnElement) {
+                const row = btnElement.closest('tr');
+                const contexto = leerContextoDeFila(row);
+
+                previewModal.style.display = "block";
+                previewContainer.innerHTML = '<p style="text-align:center; padding:20px;">Generando vista previa...</p>';
+
+                setTimeout(() => {
+                    try {
+                        const blob = generarBlobDOCX(contexto, true);
+                        previewContainer.innerHTML = "";
+                        docx.renderAsync(blob, previewContainer, null, {
+                            inWrapper: true,
+                            ignoreWidth: false,
+                            className: "docx-wrapper"
+                        }).then(() => log("Vista previa generada con éxito."));
+                    } catch (e) {
+                        previewContainer.innerHTML = `<p style="color:red; text-align:center;">Error al generar vista previa: ${e.message}</p>`;
+                        console.error(e);
+                    }
+                }, 100);
+            }
+
+            window.cerrarPreview = function() {
+                previewModal.style.display = "none";
+            }
+
+            window.handlePaste = function (e) {
+                const target = e.target;
+                if (!(target instanceof HTMLInputElement)) return;
+
+                const clip = (e.clipboardData || window.clipboardData);
+                if (!clip) return;
+                const pastedData = clip.getData('text');
+                if (!pastedData) return;
+
+                const tbody = document.getElementById(TBODY_ID);
+                if (!tbody) return;
+
+                const hasGrid = pastedData.includes('\t') || pastedData.includes('\n');
+                const firstCell = tbody.querySelector('tr.fila-registro-dinamica:first-child input');
+                const bulkPaste = hasGrid && target === firstCell;
+
+                if (!bulkPaste) return;
+
+                e.preventDefault();
+                markDirty();
+
+                const rows = pastedData.replace(/\r/g, '').trim().split('\n');
+                const numCols = detectedVars.length;
+                let rowsProcessed = 0;
+
+                rows.forEach((rowString, rowIndex) => {
+                    const cells = rowString.split('\t');
+                    if (!cells.length) return;
+
+                    let targetRow;
+                    if (rowIndex === 0) {
+                        targetRow = tbody.querySelector('tr.fila-registro-dinamica:first-child');
+                    } else {
+                        targetRow = construirFila(detectedVars, true);
+                        tbody.appendChild(targetRow);
+                    }
+
+                    const inputs = targetRow.querySelectorAll('input');
+                    cells.forEach((cellValue, colIndex) => {
+                        if (colIndex < numCols) {
+                            const input = inputs[colIndex];
+                            if (input) input.value = String(cellValue).trim();
+                        }
+                    });
+                    rowsProcessed++;
+                });
+
+                log(`✅ Pegados ${rowsProcessed} registro(s) desde el portapapeles.`);
+                updateLayoutMode();
+            };
+
+            function leerContextoDeFila(fila) {
+                const inputs = fila.querySelectorAll('input');
+                const contexto = {};
+                inputs.forEach(input => {
+                    let valor = input.value.trim();
+                    if (input.type === 'date' && valor) {
+                        valor = formatDateToSpanish(valor);
+                    }
+                    setDeep(contexto, input.name, valor);
+                });
+                return contexto;
+            }
+
+            function leerTodosLosContextos() {
+                const cuerpoTabla = document.getElementById(TBODY_ID);
+                if(!cuerpoTabla) return [];
+                const filas = cuerpoTabla.querySelectorAll('tr.fila-registro-dinamica');
+                const contextos = [];
+                filas.forEach((fila) => contextos.push(leerContextoDeFila(fila)));
+                return contextos;
+            }
+
+            function generarBlobDOCX(contexto, isPreview = false) {
+                if (!originalZip) throw new Error("No hay plantilla cargada");
+
+                const replacements = {};
+                detectedVars.forEach((k) => {
+                    const parts = k.split(".");
+                    let cur = contexto;
+                    let val = "";
+
+                    for (const p of parts) {
+                        if (cur && typeof cur === "object" && p in cur) cur = cur[p];
+                        else { cur = null; break; }
+                    }
+                    if (cur != null && cur !== undefined) val = cur;
+
+                    if (isPreview && (!val || String(val).trim() === "")) {
+                        val = `{{${k}}}`;
+                    }
+                    replacements[k] = val;
+                });
+
+                const ab = originalZip.generate({ type: "arraybuffer" });
+                const zip2 = new PizZip(ab);
+
+                const files = Object.keys(zip2.files || {});
+                const xmlNames = files.filter(n => n.startsWith("word/") && n.endsWith(".xml"));
+
+                for (const name of xmlNames) {
+                    const f = zip2.file(name);
+                    if (!f) continue;
+                    let xml = f.asText();
+                    const newXml = replacePlaceholdersInXml(xml, replacements);
+                    if (newXml !== xml) zip2.file(name, newXml);
+                }
+
+                return zip2.generate({
+                    type: "blob",
+                    mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                });
+            }
+
+            // ✅ PDF (usa backend)
+            window.generateAndDownloadPDF = async function() {
+                try {
+                    const contextos = leerTodosLosContextos();
+                    if (contextos.length === 0) {
+                        log("🚫 No hay datos para generar.");
+                        return;
+                    }
+
+                    const validContexts = contextos.filter(c =>
+                      Object.keys(c).length > 0 &&
+                      Object.values(c).some(val => val && String(val).trim() !== '')
+                    );
+
+                    if (validContexts.length === 0) {
+                        log("🚫 Todos los registros están vacíos.");
+                        return;
+                    }
+
+                    if (validContexts.length > 1) {
+                        log("⚠️ Por ahora: el PDF se genera solo del primer registro. (Luego hacemos ZIP por lote).");
+                    }
+
+                    const ctx = validContexts[0];
+
+                    log("📄 Generando DOCX en memoria...");
+                    const docxBlob = generarBlobDOCX(ctx);
+
+                    const fd = new FormData();
+                    const baseFilename = (templateFilename || "documento").replace(/\.docx$/i, "");
+                    fd.append("file", docxBlob, `${baseFilename}.docx`);
+
+                    log("📤 Enviando al backend para convertir a PDF...");
+                    const res = await fetch(`${BACKEND_URL}/api/convert/docx-to-pdf`, {
+                        method: "POST",
+                        body: fd
+                    });
+
+                    if (!res.ok) {
+                        const txt = await res.text().catch(() => "");
+                        throw new Error(`Falló la conversión. ${txt}`);
+                    }
+
+                    const pdfBlob = await res.blob();
+                    const nameVal = getRadicadoFromContext(ctx) || "Documento";
+                    saveAs(pdfBlob, `${nameVal}_${baseFilename}.pdf`);
+
+                    log("✅ PDF descargado.");
+                    markClean();
+                } catch (e) {
+                    log("❌ Error PDF: " + e.message);
+                }
+            }
+
+            // DOCX (como antes)
+            window.generateAndDownload = function() {
+                try {
+                    const contextos = leerTodosLosContextos();
+                    if (contextos.length === 0) {
+                        log("🚫 No hay datos para generar.");
+                        return;
+                    }
+
+                    const validContexts = contextos.filter(c => Object.keys(c).length > 0 && Object.values(c).some(val => val && String(val).trim() !== ''));
+
+                    if (validContexts.length === 0) {
+                         log("🚫 Todos los registros están vacíos.");
+                         return;
+                    }
+
+                    log(`Generando ${validContexts.length} documento(s)...`);
+
+                    const baseFilename = (templateFilename || "documento").replace(/\.docx$/i, "");
+                    const generatedBlobs = [];
+
+                    validContexts.forEach((ctx, index) => {
+                        try {
+                            const blob = generarBlobDOCX(ctx);
+                            const nameVal = getRadicadoFromContext(ctx) || `Doc_${index+1}`;
+                            generatedBlobs.push({ blob: blob, name: nameVal, index: index });
+                        } catch (err) {
+                            log(`❌ Error fila ${index+1}: ${err.message}`);
+                        }
+                    });
+
+                    if (generatedBlobs.length === 1) {
+                        saveAs(generatedBlobs[0].blob, `${generatedBlobs[0].name}_${baseFilename}.docx`);
+                        log("✅ Documento descargado.");
+                        markClean();
+                    } else if (generatedBlobs.length > 1) {
+                        if (typeof JSZip === 'undefined') {
+                            log("⚠️ JSZip no cargó, descargando el primero.");
+                            saveAs(generatedBlobs[0].blob, `${baseFilename}_${generatedBlobs[0].name}.docx`);
+                            markClean();
+                        } else {
+                            const zipArchiver = new JSZip();
+                            generatedBlobs.forEach(item => {
+                                const cleanName = item.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+                                zipArchiver.file(`${cleanName}_${baseFilename}.docx`, item.blob);
+                            });
+                            zipArchiver.generateAsync({type:"blob"}).then(content => {
+                                saveAs(content, `${baseFilename}_lote.zip`);
+                                log("✅ ZIP descargado con éxito.");
+                                markClean();
+                            });
+                        }
+                    }
+                } catch(e) {
+                    log("Error General: " + e.message);
+                }
+            }
+
+            function getRadicadoFromContext(ctx) {
+                for (const key of Object.keys(ctx)) {
+                    if (key.toLowerCase() === 'radicado') {
+                        const val = ctx[key];
+                        if (val && String(val).trim()) return String(val).replace(/\s/g, '_');
+                    }
+                }
+                return null;
+            }
+
+            function formatDateToSpanish(dateStr) {
+                if (!dateStr) return "";
+                const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio","julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+                const [year, month, day] = dateStr.split("-");
+                return `${parseInt(day)} de ${meses[parseInt(month) - 1]} de ${year}`;
+            }
+
+            function log(msg) {
+                console.log(msg);
+                logEl.textContent += msg + "\n";
+                logEl.scrollTop = logEl.scrollHeight;
+            }
+
+            function escapeXml(s) {
+                if (s == null) return "";
+                return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            }
+
+            function setDeep(obj, dottedKey, value) {
+                const parts = dottedKey.split(".");
+                let cur = obj;
+                for (let i = 0; i < parts.length - 1; i++) {
+                    const p = parts[i];
+                    if (!(p in cur) || typeof cur[p] !== "object") cur[p] = {};
+                    cur = cur[p];
+                }
+                cur[parts[parts.length - 1]] = value;
+            }
+
+            function extractVarsFromZip(zip) {
+                const files = Object.keys(zip.files || {});
+                const placeholderRegex = /{{\s*([\w.]+)\s*}}/g;
+                const xmlNames = files.filter((n) => n.startsWith("word/") && n.endsWith(".xml"));
+                const varsSet = new Set();
+
+                for (const name of xmlNames) {
+                    const fileObj = zip.file(name);
+                    if (!fileObj) continue;
+
+                    let xml;
+                    try { xml = fileObj.asText(); } catch (e) { continue; }
+
+                    const tRegex = /<w:t[^>]*>([\s\S]*?)<\/w:t>/g;
+                    let parts = [], m;
+                    while ((m = tRegex.exec(xml)) !== null) parts.push(m[1]);
+
+                    const combined = parts.join("");
+                    let mm;
+                    placeholderRegex.lastIndex = 0;
+                    while ((mm = placeholderRegex.exec(combined)) !== null) varsSet.add(mm[1]);
+                }
+                return Array.from(varsSet);
+            }
+
+            function replacePlaceholdersInXml(xml, replacements) {
+                const tRegex = /(<w:t[^>]*>)([\s\S]*?)(<\/w:t>)/g;
+                let runs = [];
+                let match;
+
+                while ((match = tRegex.exec(xml)) !== null) {
+                    runs.push({ prefix: match[1], text: match[2], suffix: match[3], start: match.index, full: match[0] });
+                }
+                if (runs.length === 0) return xml;
+
+                const texts = runs.map((r) => r.text || "");
+                const cum = [];
+                let s = 0;
+                for (let i = 0; i < texts.length; i++) { s += texts[i].length; cum.push(s); }
+                const combined = texts.join("");
+
+                const placeholderRegex = /{{\s*([\w.]+)\s*}}/g;
+                const matches = [];
+                let mm;
+                while ((mm = placeholderRegex.exec(combined)) !== null) {
+                    matches.push({ full: mm[0], key: mm[1], index: mm.index, length: mm[0].length });
+                }
+                if (matches.length === 0) return xml;
+
+                for (let mi = matches.length - 1; mi >= 0; mi--) {
+                    const m = matches[mi];
+                    const startIdx = m.index;
+                    const endIdx = m.index + m.length - 1;
+
+                    let startRun = 0;
+                    while (startRun < cum.length && startIdx >= cum[startRun]) startRun++;
+                    const runStartOffset = startRun === 0 ? startIdx : startIdx - cum[startRun - 1];
+
+                    let endRun = 0;
+                    while (endRun < cum.length && endIdx >= cum[endRun]) endRun++;
+                    const runEndOffset = endRun === 0 ? endIdx : endIdx - cum[endRun - 1];
+
+                    const replRaw = m.key in replacements ? replacements[m.key] : "";
+                    const repl = escapeXml(String(replRaw));
+
+                    const before = texts[startRun].slice(0, runStartOffset);
+                    const after = texts[endRun].slice(runEndOffset + 1);
+
+                    texts[startRun] = before + repl + after;
+                    for (let r = startRun + 1; r <= endRun; r++) texts[r] = "";
+                }
+
+                let outXml = "";
+                let curPos = 0;
+                let ri = 0;
+                tRegex.lastIndex = 0;
+                while ((match = tRegex.exec(xml)) !== null) {
+                    outXml += xml.slice(curPos, match.index);
+                    outXml += runs[ri].prefix + texts[ri].replace(/<w:br\/>/g, '') + runs[ri].suffix;
+                    curPos = match.index + match[0].length;
+                    ri++;
+                }
+                outXml += xml.slice(curPos);
+                return outXml;
+            }
+
+            function buildForm(vars) {
+                formArea.innerHTML = "";
+                detectedVars = vars;
+
+                if (!detectedVars || detectedVars.length === 0) {
+                    formArea.innerHTML = "<p><i>No se detectaron variables {{...}} en la plantilla.</i></p>";
+                    generateBtn.disabled = true;
+                    if (generateDocxBtn) generateDocxBtn.disabled = true;
+                    return;
+                }
+
+                const fieldset = document.createElement('fieldset');
+                const legend = document.createElement('legend');
+                legend.textContent = "2) Registros de Documentos";
+                fieldset.appendChild(legend);
+
+                const info = document.createElement("p");
+                info.className = "small";
+                info.innerHTML = `Variables: <b>${detectedVars.join(", ")}</b>.`;
+                fieldset.appendChild(info);
+
+                const tableWrapper = document.createElement('div');
+                tableWrapper.className = 'table-wrapper';
+                tableWrapper.id = TABLE_CONTAINER_ID;
+                tableWrapper.tabIndex = 0;
+                tableWrapper.addEventListener('paste', handlePaste);
+
+                const table = document.createElement('table');
+                table.id = "tabla-dinamica";
+
+                const thead = document.createElement('thead');
+                const trHead = document.createElement('tr');
+                detectedVars.forEach(v => {
+                    const th = document.createElement('th');
+                    th.textContent = v;
+                    trHead.appendChild(th);
+                });
+                const thAccion = document.createElement('th');
+                thAccion.textContent = 'Acción';
+                trHead.appendChild(thAccion);
+                thead.appendChild(trHead);
+                table.appendChild(thead);
+
+                const tbody = document.createElement('tbody');
+                tbody.id = TBODY_ID;
+                table.appendChild(tbody);
+
+                tableWrapper.appendChild(table);
+                fieldset.appendChild(tableWrapper);
+
+                const btnAddRow = document.createElement('button');
+                btnAddRow.textContent = '➕ Agregar Registro';
+                btnAddRow.onclick = agregarFila;
+                btnAddRow.style.marginTop = '15px';
+                fieldset.appendChild(btnAddRow);
+
+                formArea.appendChild(fieldset);
+
+                agregarFila();
+                generateBtn.disabled = false;
+                if (generateDocxBtn) generateDocxBtn.disabled = false;
+
+                fileInput.classList.add('hidden');
+                reloadBtn.classList.remove('hidden');
+
+                markClean();
+            }
+
+        })();
+    </script>
+</body>
+</html>
