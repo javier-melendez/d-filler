@@ -8,7 +8,7 @@ import os from "os";
 const app = express();
 const upload = multer({ dest: os.tmpdir() });
 
-// CORS (para que GitHub Pages pueda llamar al backend)
+// CORS (para GitHub Pages)
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   next();
@@ -23,35 +23,48 @@ app.post("/api/convert/docx-to-pdf", upload.single("file"), async (req, res) => 
   try {
     if (!req.file) return res.status(400).send("No file uploaded.");
 
-    // 1) Renombrar a .docx (LibreOffice lo necesita)
+    // 1) Guardar con extensión .docx (clave para LO)
     inputDocxPath = path.join(os.tmpdir(), `${req.file.filename}.docx`);
     fs.renameSync(req.file.path, inputDocxPath);
 
-    // 2) Carpeta de salida temporal
+    // 2) Carpeta salida
     outDir = fs.mkdtempSync(path.join(os.tmpdir(), "out-"));
 
-    // 3) Convertir con LibreOffice
-    await new Promise((resolve, reject) => {
-      execFile(
-        "soffice",
-        ["--headless", "--nologo", "--nofirststartwizard", "--convert-to", "pdf", "--outdir", outDir, inputDocxPath],
-        (err, stdout, stderr) => {
-          if (err) {
-            console.error("LibreOffice error:", err);
-            console.error("stdout:", stdout);
-            console.error("stderr:", stderr);
-            reject(err);
-          } else {
-            resolve();
-          }
-        }
-      );
+    console.log("=== CONVERT START ===");
+    console.log("Input:", inputDocxPath);
+    console.log("OutDir:", outDir);
+
+    // 3) Ejecutar LibreOffice con HOME en /tmp y un perfil temporal
+    const loProfileDir = fs.mkdtempSync(path.join(os.tmpdir(), "lo-profile-"));
+    const loEnv = { ...process.env, HOME: os.tmpdir() };
+
+    const args = [
+      "--headless",
+      "--nologo",
+      "--nofirststartwizard",
+      `-env:UserInstallation=file://${loProfileDir}`,
+      "--convert-to",
+      "pdf:writer_pdf_Export",
+      "--outdir",
+      outDir,
+      inputDocxPath
+    ];
+
+    const { stdout, stderr } = await new Promise((resolve, reject) => {
+      execFile("soffice", args, { env: loEnv }, (err, stdout, stderr) => {
+        if (err) return reject({ err, stdout, stderr });
+        resolve({ stdout, stderr });
+      });
     });
 
-    // 4) Buscar el PDF generado (no asumimos el nombre)
-    const files = fs.readdirSync(outDir);
-    const pdfName = files.find((f) => f.toLowerCase().endsWith(".pdf"));
+    console.log("LibreOffice stdout:", stdout);
+    console.log("LibreOffice stderr:", stderr);
 
+    // 4) Ver qué dejó LO en la carpeta
+    const outFiles = fs.readdirSync(outDir);
+    console.log("OutDir files:", outFiles);
+
+    const pdfName = outFiles.find((f) => f.toLowerCase().endsWith(".pdf"));
     if (!pdfName) {
       return res.status(500).send("PDF not generated.");
     }
@@ -63,16 +76,23 @@ app.post("/api/convert/docx-to-pdf", upload.single("file"), async (req, res) => 
 
     fs.createReadStream(pdfPath)
       .on("close", () => {
-        // Limpieza
+        // limpieza
         try { if (inputDocxPath && fs.existsSync(inputDocxPath)) fs.unlinkSync(inputDocxPath); } catch {}
         try { if (outDir && fs.existsSync(outDir)) fs.rmSync(outDir, { recursive: true, force: true }); } catch {}
+        try { if (loProfileDir && fs.existsSync(loProfileDir)) fs.rmSync(loProfileDir, { recursive: true, force: true }); } catch {}
       })
       .pipe(res);
 
   } catch (e) {
-    console.error(e);
+    // Si fue error de LO, e tiene {err, stdout, stderr}
+    console.error("=== CONVERT ERROR ===");
+    console.error(e?.err || e);
+    if (e?.stdout) console.error("stdout:", e.stdout);
+    if (e?.stderr) console.error("stderr:", e.stderr);
+
     res.status(500).send("Conversion error.");
-    // Limpieza si hubo error
+
+    // limpieza
     try { if (inputDocxPath && fs.existsSync(inputDocxPath)) fs.unlinkSync(inputDocxPath); } catch {}
     try { if (outDir && fs.existsSync(outDir)) fs.rmSync(outDir, { recursive: true, force: true }); } catch {}
   }
