@@ -1,0 +1,6 @@
+# Pega aquí tus dependencias
+fastapi
+uvicorn[standard]
+python-docx
+PyMuPDF
+python-multipart
