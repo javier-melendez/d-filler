@@ -1,6 +1,5 @@
-# Pega aquí tus dependencias
-fastapi
-uvicorn[standard]
-python-docx
-PyMuPDF
-python-multipart
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-docx==0.8.11
+PyMuPDF==1.23.8
+python-multipart==0.0.6
