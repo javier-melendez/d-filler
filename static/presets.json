@@ -36,17 +36,14 @@
   "FIRMA": {
     "type": "text",
     "label": "Firma",
-    "value": "PEDRO ALEJANDRO NIÑO ROA"
+    "placeholder": "Escribe el nombre aquí",
+    "value": ""
   },
   "ELABORO": {
-    "type": "select",
+    "type": "text",
     "label": "Elaboró",
-    "options": [
-      { "value": "", "label": "Selecciona un valor..." },
-      { "value": "Elaboró: Laura López G.", "label": "Elaboró: Laura López G." },
-      { "value": "Elaboró: Isaac Torres", "label": "Elaboró: Isaac Torres" }
-    ],
-    "value": "Elaboró: Laura López G."
+    "placeholder": "Escribe el nombre aquí",
+    "value": ""
   },
   "FECHA_ACTO": ""
 }

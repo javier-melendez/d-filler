@@ -374,6 +374,25 @@
                             option.textContent = opt.label;
                             inp.appendChild(option);
                         });
+                    } else if (presetConfig && presetConfig.type === "select" && presetConfig.allowCustom) {
+                        inp = document.createElement("input");
+                        inp.type = "text";
+                        inp.name = v;
+                        inp.placeholder = presetConfig.placeholder || (esModelo ? "Escribe o selecciona..." : "");
+                        if (presetConfig.value != null) inp.value = presetConfig.value;
+
+                        const datalistId = `datalist-${v}`;
+                        inp.setAttribute("list", datalistId);
+
+                        const dataList = document.createElement("datalist");
+                        dataList.id = datalistId;
+                        presetConfig.options.forEach(opt => {
+                            const option = document.createElement("option");
+                            option.value = opt.value;
+                            if (opt.label && opt.label !== opt.value) option.label = opt.label;
+                            dataList.appendChild(option);
+                        });
+                        td.appendChild(dataList);
                     } else if (presetConfig && presetConfig.type === "select") {
                         inp = document.createElement("select");
                         presetConfig.options.forEach(opt => {
@@ -422,7 +441,11 @@
                         if (esModelo) inp.placeholder = "Valor para " + v;
                     }
 
-                    inp.name = v;
+                    if (inp && inp._namedInput) {
+                        inp._namedInput.name = v;
+                    } else if (inp) {
+                        inp.name = v;
+                    }
 
                     const labelDiv = document.createElement('div');
                     labelDiv.className = 'dyn-label';
@@ -471,13 +494,13 @@
                 divAccion.className = 'action-cell';
 
                 const btnPreview = document.createElement('button');
-                btnPreview.textContent = '👁️';
+                btnPreview.textContent = '👁️ Previsualizar';
                 btnPreview.title = 'Previsualizar este documento';
                 btnPreview.className = 'iconbtn iconbtn-preview';
                 btnPreview.onclick = () => previsualizarFila(btnPreview);
 
                 const btnEliminar = document.createElement('button');
-                btnEliminar.textContent = '🗑️';
+                btnEliminar.textContent = '🗑️ Eliminar';
                 btnEliminar.title = 'Eliminar fila';
                 btnEliminar.className = 'iconbtn iconbtn-delete';
                 btnEliminar.onclick = () => eliminarFila(btnEliminar);
