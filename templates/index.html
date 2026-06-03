@@ -16,33 +16,39 @@
         fieldset { border:1px solid var(--border); border-radius:var(--radius); background:#fff; padding:1.5em; margin-bottom:1.5em; box-shadow:none; }
         legend { font-weight:600; color:var(--accent); padding:0 .5em; }
         label { font-size:1em; font-weight:500; margin-bottom:.25em; display:block; }
-        input, select { width:100%; padding:.6em; border:1px solid var(--border); border-radius:var(--radius); background:#fafbfc; font-size:1em; margin-bottom:1em; box-sizing:border-box; }
-        button { border:none; border-radius:var(--radius); padding:.7em 1.2em; font-size:1em; font-weight:500; background:var(--accent); color:#fff; cursor:pointer; margin-right:.5em; margin-bottom:.5em; transition:background .2s; }
+        * { box-sizing: border-box; }
+        body { font-family:system-ui,sans-serif; background:var(--bg); color:var(--fg); margin:12px; max-width:none; line-height:1.5; padding:0; }
+        h2 { font-size:1.4rem; color:var(--accent); margin-bottom:.6em; font-weight:600; text-align:left; }
+        fieldset { border:1px solid var(--border); border-radius:var(--radius); background:#fff; padding:1.1em; margin-bottom:1.2em; box-shadow:none; width:100%; max-width:1400px; }
+        legend { font-weight:600; color:var(--accent); padding:0 .4em; }
+        label { font-size:.98em; font-weight:500; margin-bottom:.2em; display:block; }
+        input, select { width:100%; padding:.5em .55em; border:1px solid var(--border); border-radius:var(--radius); background:#fafbfc; font-size:.98em; margin-bottom:.75em; }
+        input[type="date"] { font-size:.92em; }
+        button { border:none; border-radius:var(--radius); padding:.52em .9em; font-size:.96em; font-weight:500; background:var(--accent); color:#fff; cursor:pointer; margin-right:.4em; margin-bottom:.4em; transition:background .2s; }
         button:active { opacity:.9; }
         button:disabled { background:#ccc; cursor:not-allowed; }
-        pre { background:#f5f5f5; border:1px solid var(--border); border-radius:var(--radius); padding:1em; font-family:ui-monospace,monospace; font-size:.98em; overflow-x:auto; max-height:200px; }
-        .small { font-size:.92em; color:#666; }
-        hr { border:0; border-top:1px solid var(--border); margin:1.5em 0; }
+        pre { background:#f5f5f5; border:1px solid var(--border); border-radius:var(--radius); padding:.85em; font-family:ui-monospace,monospace; font-size:.92em; overflow-x:auto; max-height:180px; }
+        .small { font-size:.88em; color:#666; margin-bottom:.85em; }
+        hr { border:0; border-top:1px solid var(--border); margin:1.1em 0; }
         .hidden { display:none; }
-
-        .table-wrapper { overflow-x:auto; width:100%; padding-bottom:8px; border:1px dashed var(--border); border-radius:var(--radius); }
-        #tabla-dinamica { table-layout:auto; width:max-content; border-collapse:collapse; margin-bottom:0; }
-        #tabla-dinamica th, #tabla-dinamica td { border:1px solid var(--border); padding:4px 8px; text-align:left; font-size:.9em; white-space:nowrap; vertical-align:top; }
-        #tabla-dinamica th { background-color:#e0e0e0; color:var(--fg); font-weight:600; text-transform:uppercase; font-size:.85em; }
-        #tabla-dinamica input { padding:5px; margin-bottom:0; }
-
-        .action-cell { display:flex; gap:4px; }
-        .iconbtn { padding:.4em .6em; line-height:1; margin:0; display:inline-block; text-align:center; cursor:pointer; font-size:1.1em; }
+        input, select, button, textarea { min-width: 0; }
+        #formArea { display:flex; flex-direction:column; gap:.85rem; align-items:flex-start; width:100%; }
+        .table-wrapper { overflow-x:auto; width:100%; padding:10px; border:1px dashed var(--border); border-radius:var(--radius); }
+        #tabla-dinamica { width:100%; border-collapse:collapse; table-layout:auto; min-width:100%; }
+        #tabla-dinamica th, #tabla-dinamica td { padding:.35rem .45rem; border-bottom:1px solid rgba(0,0,0,.08); vertical-align:top; white-space:normal; word-break:break-word; }
+        #tabla-dinamica th { text-align:left; font-size:.88rem; color:#444; white-space:normal; }
+        #tabla-dinamica td { min-width: 80px; }
+        #tabla-dinamica td > div.dyn-label { margin-bottom:.2rem; font-size:.82rem; }
+        #tabla-dinamica tbody tr:hover { background:#f9fdfd; }
+        .action-cell { display:flex; gap:4px; flex-wrap:wrap; align-items:center; justify-content:flex-start; }
+        .iconbtn { padding:.32em .55em; line-height:1; margin:0; display:inline-flex; align-items:center; justify-content:center; text-align:center; cursor:pointer; font-size:.95em; min-width:2.2em; }
         .iconbtn-delete { background:#d32f2f; color:white; }
         .iconbtn-delete:hover { background:#c62828; }
         .iconbtn-preview { background:#0288d1; color:white; }
         .iconbtn-preview:hover { background:#0277bd; }
         .iconbtn-pdf { background:#6a1b9a; color:white; }
         .iconbtn-pdf:hover { background:#4a148c; }
-
-        #tabla-dinamica th:last-child, #tabla-dinamica td:last-child { width:130px; }
-        input[type="date"] { font-size:.9em; }
-
+        #tabla-dinamica th:last-child, #tabla-dinamica td:last-child { width:120px; }
         .table-wrapper.single-record-mode { border-style:solid; }
         .table-wrapper.single-record-mode #tabla-dinamica { width:100%; }
         .table-wrapper.single-record-mode thead { display:none; }
@@ -50,9 +56,39 @@
         .table-wrapper.single-record-mode tbody tr td { display:block; border:none; padding:6px 8px 10px; white-space:normal; }
         .table-wrapper.single-record-mode tbody tr td:last-child { border-top:1px solid var(--border); margin-top:4px; padding-top:8px; }
         .table-wrapper.single-record-mode .dyn-label { display:block; font-size:.9em; font-weight:500; margin-bottom:2px; color:#444; }
-        .table-wrapper:not(.single-record-mode) .dyn-label { display:none; }
+        .table-wrapper:not(.single-record-mode):not(.two-column-mode) .dyn-label { display:none; }
+        .table-wrapper.two-column-mode thead,
+        .table-wrapper.two-column-mode thead tr,
+        .table-wrapper.two-column-mode thead th { display:none !important; }
         .table-wrapper.single-record-mode #tabla-dinamica th:last-child,
         .table-wrapper.single-record-mode #tabla-dinamica td:last-child { width:auto; }
+        .table-wrapper.two-column-mode #tabla-dinamica { display:block; width:100%; }
+        .table-wrapper.two-column-mode tbody { display:block; width:100%; }
+        .table-wrapper.two-column-mode tbody tr { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:.35rem; width:100%; }
+        .table-wrapper.two-column-mode th,
+        .table-wrapper.two-column-mode td { display:flex; flex-direction:column; width:100%; min-width:0; }
+        .table-wrapper.two-column-mode th { padding:.4rem .45rem; }
+        .table-wrapper.two-column-mode td { padding:.35rem .45rem; }
+        .table-wrapper.two-column-mode .dyn-label { display:block; font-size:.82rem; margin-bottom:.2rem; color:#444; }
+        .table-wrapper.two-column-mode #tabla-dinamica th:last-child,
+        .table-wrapper.two-column-mode #tabla-dinamica td:last-child { width:auto; }
+        @media (max-width: 1200px) {
+            fieldset { padding:1.2em; }
+            #tabla-dinamica th, #tabla-dinamica td { padding:.45rem .55rem; }
+        }
+        @media (max-width: 1024px) {
+            #tabla-dinamica td { min-width: 100px; }
+            .table-wrapper { padding:10px; }
+            .iconbtn { min-width: 2.4em; }
+        }
+        @media (max-width: 780px) {
+            body { margin: 12px; padding: 0; }
+            input, select, button { font-size:.96em; }
+            #tabla-dinamica th, #tabla-dinamica td { font-size:.92em; }
+            #tabla-dinamica td input, #tabla-dinamica td select { min-width: 0; }
+            .iconbtn { width: auto; }
+            #formArea { gap: 0.75rem; }
+        }
 
         /* Modal común */
         .modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.6); backdrop-filter:blur(2px); }
@@ -151,6 +187,40 @@
             const IMAGE_KEY = "PDF_IMAGE";
             const LIMIT = 10;
 
+            let PRESET_OPTION_MAP = {};
+
+            async function loadPresetOptions() {
+                try {
+                    const res = await fetch("/static/presets.json");
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+                    PRESET_OPTION_MAP = data || {};
+                    log("✅ Cargado config de listas desplegables.");
+                } catch (err) {
+                    console.warn("No se pudo cargar presets.json:", err);
+                    log("⚠️ No se cargó la configuración de valores predefinidos. Las listas desplegables pueden no aparecer.");
+                    PRESET_OPTION_MAP = {};
+                }
+            }
+
+            function getPresetOptionsForVar(variableName) {
+                const rawConfig = PRESET_OPTION_MAP[variableName] || PRESET_OPTION_MAP[variableName.toUpperCase()];
+                if (!rawConfig) return null;
+                if (Array.isArray(rawConfig)) {
+                    return { type: "select", options: rawConfig, label: null, value: rawConfig.value || null };
+                }
+                if (rawConfig.type === "datalist" && Array.isArray(rawConfig.options)) {
+                    return { type: "datalist", options: rawConfig.options, label: rawConfig.label || null, placeholder: rawConfig.placeholder || null, value: rawConfig.value || null };
+                }
+                if (rawConfig.type === "select" && Array.isArray(rawConfig.options)) {
+                    return { type: "select", options: rawConfig.options, label: rawConfig.label || null, placeholder: rawConfig.placeholder || null, value: rawConfig.value || null };
+                }
+                if (rawConfig.type === "text") {
+                    return { type: "text", label: rawConfig.label || null, placeholder: rawConfig.placeholder || null, value: rawConfig.value || null };
+                }
+                return null;
+            }
+
             // Para evitar fugas: vamos revocando objectURLs
             const pdfObjectUrlByInput = new WeakMap();
 
@@ -166,12 +236,17 @@
 
             document.addEventListener("input", function (e) {
                 const el = e.target;
-                if (el && el.matches && el.matches(`#${TABLE_CONTAINER_ID} input`)) {
+                if (el && el.matches && el.matches(`#${TABLE_CONTAINER_ID} input, #${TABLE_CONTAINER_ID} select`)) {
                     markDirty();
+                    const row = el.closest('tr.fila-registro-dinamica');
+                    if (row) actualizarTotalesFila(row);
                 }
             });
 
-            fileInput.addEventListener('change', handleFileSelect, false);
+            fileInput.addEventListener('change', async (evt) => {
+                await loadPresetOptions();
+                await handleFileSelect(evt);
+            }, false);
 
             reloadBtn.addEventListener('click', () => {
                 if (hasUnsavedChanges) {
@@ -202,7 +277,7 @@
                 return await res.blob();
             }
 
-            function handleFileSelect(evt) {
+            async function handleFileSelect(evt) {
                 const f = evt.target.files[0];
                 if (!f) return;
                 templateFilename = f.name;
@@ -280,8 +355,60 @@
                     const td = document.createElement('td');
                     const lower = v.toLowerCase();
                     let inp;
+                    const presetConfig = getPresetOptionsForVar(v);
+                    const isConceptoField = /^concepto\d*$/i.test(v);
 
-                    if (lower.includes("fecha") && !lower.includes("fechas")) {
+                    if (isConceptoField) {
+                        inp = document.createElement("select");
+                        const defaultOpt = document.createElement("option");
+                        defaultOpt.value = "";
+                        defaultOpt.textContent = "Selecciona una opción...";
+                        inp.appendChild(defaultOpt);
+                        [
+                            { value: "Agencias en derecho", label: "Agencias en derecho" },
+                            { value: "Agencias 2da. instancia", label: "Agencias 2da. instancia" },
+                            { value: "Honorarios", label: "Honorarios" }
+                        ].forEach(opt => {
+                            const option = document.createElement("option");
+                            option.value = opt.value;
+                            option.textContent = opt.label;
+                            inp.appendChild(option);
+                        });
+                    } else if (presetConfig && presetConfig.type === "select") {
+                        inp = document.createElement("select");
+                        presetConfig.options.forEach(opt => {
+                            const option = document.createElement("option");
+                            option.value = opt.value;
+                            option.textContent = opt.label;
+                            inp.appendChild(option);
+                        });
+                        if (presetConfig.value != null) inp.value = presetConfig.value;
+                    } else if (presetConfig && presetConfig.type === "datalist") {
+                        inp = document.createElement("input");
+                        inp.type = "text";
+                        const datalistId = `datalist-${v}`;
+                        inp.setAttribute("list", datalistId);
+                        inp.placeholder = presetConfig.placeholder || (esModelo ? "Selecciona o escribe..." : "");
+                        if (presetConfig.value != null) inp.value = presetConfig.value;
+
+                        const dataList = document.createElement("datalist");
+                        dataList.id = datalistId;
+                        presetConfig.options.forEach(opt => {
+                            const option = document.createElement("option");
+                            option.value = opt.value;
+                            dataList.appendChild(option);
+                        });
+                        td.appendChild(dataList);
+                    } else if (presetConfig && presetConfig.type === "text") {
+                        inp = document.createElement("input");
+                        inp.type = "text";
+                        inp.placeholder = presetConfig.placeholder || (esModelo ? "Escribe aquí..." : "");
+                        if (presetConfig.value != null) inp.value = presetConfig.value;
+                    } else if (v.toUpperCase() === "FECHA_HOY") {
+                        inp = document.createElement("input");
+                        inp.type = "date";
+                        inp.value = getTodayDateISO();
+                    } else if (lower.includes("fecha") && !lower.includes("fechas")) {
                         inp = document.createElement("input");
                         inp.type = "date";
                     } else if (v.includes('.')) {
@@ -299,7 +426,7 @@
 
                     const labelDiv = document.createElement('div');
                     labelDiv.className = 'dyn-label';
-                    labelDiv.textContent = v;
+                    labelDiv.textContent = (presetConfig && presetConfig.label) ? presetConfig.label : v;
 
                     td.appendChild(labelDiv);
                     td.appendChild(inp);
@@ -435,7 +562,7 @@
 
             window.handlePaste = function (e) {
                 const target = e.target;
-                if (!(target instanceof HTMLInputElement)) return;
+                if (!(target instanceof HTMLInputElement) && !(target instanceof HTMLSelectElement)) return;
 
                 const clip = (e.clipboardData || window.clipboardData);
                 if (!clip) return;
@@ -446,7 +573,7 @@
                 if (!tbody) return;
 
                 const hasGrid = pastedData.includes('\t') || pastedData.includes('\n');
-                const firstCell = tbody.querySelector('tr.fila-registro-dinamica:first-child input');
+                const firstCell = tbody.querySelector('tr.fila-registro-dinamica:first-child input, tr.fila-registro-dinamica:first-child select');
                 const bulkPaste = hasGrid && target === firstCell;
 
                 if (!bulkPaste) return;
@@ -469,7 +596,7 @@
                         tbody.appendChild(targetRow);
                     }
 
-                    const inputs = targetRow.querySelectorAll('input');
+                    const inputs = targetRow.querySelectorAll('input, select');
                     let inputCol = 0;
 
                     cells.forEach((cellValue) => {
@@ -488,11 +615,12 @@
             };
 
             function leerRegistroDeFila(fila) {
-                const inputs = fila.querySelectorAll('input');
+                const inputs = fila.querySelectorAll('input, select');
                 const contexto = {};
 
                 inputs.forEach(input => {
                     if (input.type === "file") return;
+                    if (!input.name) return;
                     let valor = (input.value || "").trim();
                     if (input.type === 'date' && valor) valor = formatDateToSpanish(valor);
                     setDeep(contexto, input.name, valor);
@@ -501,7 +629,92 @@
                 const pdfRowInput = fila.querySelector(`input.${PDF_ROW_CLASS}`);
                 const pdfFile = pdfRowInput && pdfRowInput.files ? pdfRowInput.files[0] : null;
 
-                return { contexto, pdfFile };
+                const contextoConTotales = computeTotalFields(contexto);
+                return { contexto: contextoConTotales, pdfFile };
+            }
+
+            function parseCurrencyValue(valueStr) {
+                let raw = String(valueStr || "").trim();
+                raw = raw.replace(/\s/g, '').replace(/\$/g, '').replace(/[^0-9.,\-]/g, '');
+                if (raw === '') return NaN;
+                const hasComma = raw.indexOf(',') >= 0;
+                const hasDot = raw.indexOf('.') >= 0;
+                if (hasComma && hasDot) {
+                    if (raw.lastIndexOf(',') > raw.lastIndexOf('.')) {
+                        raw = raw.replace(/\./g, '').replace(/,/g, '.');
+                    } else {
+                        raw = raw.replace(/,/g, '');
+                    }
+                } else if (hasComma) {
+                    raw = raw.replace(/,/g, '.');
+                } else if (hasDot) {
+                    // En formato español, los puntos suelen ser separadores de miles.
+                    raw = raw.replace(/\./g, '');
+                }
+                const parsed = parseFloat(raw);
+                return Number.isFinite(parsed) ? parsed : NaN;
+            }
+
+            function formatNumberForTemplate(value) {
+                if (!Number.isFinite(value)) return "";
+                const isInteger = Math.round(value) === value;
+                const absoluteValue = Math.abs(value);
+                const integerPart = Math.floor(absoluteValue);
+                const decimalPart = absoluteValue - integerPart;
+                const integerFormatted = integerPart.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+                let formatted = integerFormatted;
+                if (!isInteger) {
+                    const decimals = Math.round(decimalPart * 100);
+                    formatted += ',' + String(decimals).padStart(2, '0');
+                }
+                if (value < 0) formatted = '-' + formatted;
+                return formatted;
+            }
+
+            function computeTotalFields(contexto) {
+                const result = { ...contexto };
+                const valorKeys = Object.keys(result).filter((key) => /^VALOR\d+$/i.test(key));
+                if (valorKeys.length === 0) return result;
+
+                let total = 0;
+                let found = false;
+                valorKeys.forEach((key) => {
+                    const num = parseCurrencyValue(result[key]);
+                    if (Number.isFinite(num)) {
+                        total += num;
+                        found = true;
+                        result[key] = formatNumberForTemplate(num);
+                    }
+                });
+                if (!found) return result;
+
+                const totalStr = formatNumberForTemplate(total);
+                result.TOTAL = totalStr;
+                result.VALOR_LETRAS = getValorLetrasFromTotal(totalStr);
+                return result;
+            }
+
+            function actualizarTotalesFila(fila) {
+                const inputs = fila.querySelectorAll('input, select');
+                const rowData = {};
+                inputs.forEach(input => {
+                    if (input.type === 'file') return;
+                    if (!input.name) return;
+                    let valor = (input.value || '').trim();
+                    if (input.type === 'date' && valor) valor = formatDateToSpanish(valor);
+                    rowData[input.name] = valor;
+                });
+
+                const actualizados = computeTotalFields(rowData);
+                inputs.forEach(input => {
+                    if (!input.name) return;
+                    const key = input.name.toUpperCase();
+                    if (key === 'TOTAL' || key === 'VALOR_LETRAS' || /^VALOR\d+$/.test(key)) {
+                        const nuevoValor = actualizados[input.name] || actualizados[key] || '';
+                        if (input.value !== nuevoValor) input.value = nuevoValor;
+                    }
+                });
             }
 
             function leerTodosLosRegistros() {
@@ -516,6 +729,7 @@
             function generarBlobDOCX(contexto, isPreview = false, keepImagePlaceholder = false) {
                 if (!originalZip) throw new Error("No hay plantilla cargada");
 
+                const contextoConTotales = computeTotalFields(contexto);
                 const replacements = {};
                 detectedVars.forEach((k) => {
                     if (k === IMAGE_KEY) {
@@ -523,15 +737,19 @@
                         return;
                     }
 
-                    const parts = k.split(".");
-                    let cur = contexto;
-                    let val = "";
+                    let val = null;
+                    if (val == null) {
+                        const parts = k.split(".");
+                        let cur = contextoConTotales;
+                        let value = "";
 
-                    for (const p of parts) {
-                        if (cur && typeof cur === "object" && p in cur) cur = cur[p];
-                        else { cur = null; break; }
+                        for (const p of parts) {
+                            if (cur && typeof cur === "object" && p in cur) cur = cur[p];
+                            else { cur = null; break; }
+                        }
+                        if (cur != null && cur !== undefined) value = cur;
+                        val = value;
                     }
-                    if (cur != null && cur !== undefined) val = cur;
 
                     if (isPreview && (!val || String(val).trim() === "")) {
                         val = `{{${k}}}`;
@@ -660,6 +878,90 @@
                 return `${parseInt(day)} de ${meses[parseInt(month) - 1]} de ${year}`;
             }
 
+            function getTodayDateISO() {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            function numberToSpanishWords(number) {
+                const unidades = ["", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez", "once", "doce", "trece", "catorce", "quince", "dieciséis", "diecisiete", "dieciocho", "diecinueve"];
+                const decenas = ["", "", "veinte", "treinta", "cuarenta", "cincuenta", "sesenta", "setenta", "ochenta", "noventa"];
+                const centenas = ["", "ciento", "doscientos", "trescientos", "cuatrocientos", "quinientos", "seiscientos", "setecientos", "ochocientos", "novecientos"];
+
+                function convertirGrupo(n) {
+                    let result = "";
+                    if (n === 0) return "";
+                    if (n === 100) return "cien";
+                    if (n > 99) {
+                        result += `${centenas[Math.floor(n / 100)]}`;
+                        n %= 100;
+                        if (n > 0) result += " ";
+                    }
+                    if (n > 0 && n < 20) {
+                        result += unidades[n];
+                    } else if (n >= 20) {
+                        const u = n % 10;
+                        const d = Math.floor(n / 10);
+                        if (d === 2 && u > 0) {
+                            result += `veinti${unidades[u]}`;
+                        } else {
+                            result += decenas[d];
+                            if (u > 0) result += ` y ${unidades[u]}`;
+                        }
+                    }
+                    return result;
+                }
+
+                if (!Number.isFinite(number)) return "";
+                if (number === 0) return "CERO";
+
+                const entero = Math.floor(Math.abs(number));
+                const decimales = Math.round((Math.abs(number) - entero) * 100);
+                const millones = Math.floor(entero / 1000000);
+                const miles = Math.floor((entero % 1000000) / 1000);
+                const cientos = entero % 1000;
+
+                const partes = [];
+                if (millones > 0) {
+                    if (millones === 1) partes.push("un millón");
+                    else partes.push(`${convertirGrupo(millones)} millones`);
+                }
+                if (miles > 0) {
+                    if (miles === 1) partes.push("mil");
+                    else partes.push(`${convertirGrupo(miles)} mil`);
+                }
+                if (cientos > 0) {
+                    partes.push(`${convertirGrupo(cientos)}`);
+                }
+
+                let texto = partes.join(" ").trim();
+                if (texto === "") texto = "cero";
+                texto = texto.replace(/\s+/g, " ");
+                texto = texto.toUpperCase();
+
+                if (decimales > 0) {
+                    const cents = String(decimales).padStart(2, '0');
+                    texto += ` CON ${cents}/100`;
+                }
+
+                return texto;
+            }
+
+            function getValorLetrasFromTotal(totalStr) {
+                const raw = String(totalStr || "")
+                    .replace(/\./g, '')
+                    .replace(/,/g, '.')
+                    .replace(/[^\d.\-]/g, '')
+                    .trim();
+                const num = parseFloat(raw);
+                if (!Number.isFinite(num)) return "";
+                const entero = Math.trunc(num);
+                return `${numberToSpanishWords(entero)} PESOS MCTE`;
+            }
+
             function log(msg) {
                 console.log(msg);
                 logEl.textContent += msg + "\n";
@@ -708,11 +1010,12 @@
 
             function replacePlaceholdersInXml(xml, replacements) {
                 const tRegex = /(<w:t[^>]*>)([\s\S]*?)(<\/w:t>)/g;
-                let runs = [];
-                let match;
+                const localPlaceholderRegex = /{{\s*([\w.]+)\s*}}/g;
 
+                const runs = [];
+                let match;
                 while ((match = tRegex.exec(xml)) !== null) {
-                    runs.push({ prefix: match[1], text: match[2], suffix: match[3], start: match.index, full: match[0] });
+                    runs.push({ prefix: match[1], text: match[2], suffix: match[3], start: match.index });
                 }
                 if (runs.length === 0) return xml;
 
@@ -722,10 +1025,9 @@
                 for (let i = 0; i < texts.length; i++) { s += texts[i].length; cum.push(s); }
                 const combined = texts.join("");
 
-                const placeholderRegex = /{{\s*([\w.]+)\s*}}/g;
                 const matches = [];
                 let mm;
-                while ((mm = placeholderRegex.exec(combined)) !== null) {
+                while ((mm = localPlaceholderRegex.exec(combined)) !== null) {
                     matches.push({ full: mm[0], key: mm[1], index: mm.index, length: mm[0].length });
                 }
                 if (matches.length === 0) return xml;
@@ -748,9 +1050,7 @@
 
                     const before = texts[startRun].slice(0, runStartOffset);
                     const after = texts[endRun].slice(runEndOffset + 1);
-
                     texts[startRun] = before + repl + after;
-
                     for (let r = startRun + 1; r <= endRun; r++) texts[r] = "";
                 }
 
@@ -788,13 +1088,14 @@
 
                 const info = document.createElement("p");
                 info.className = "small";
-                info.innerHTML = `Variables: <b>${detectedVars.join(", ")}</b>.`;
+                info.innerHTML = `Variables: <b>${detectedVars.join(", ")}</b>. Algunos campos pueden aparecer como listas desplegables si tienen valores predefinidos.`;
                 fieldset.appendChild(info);
 
                 const tableWrapper = document.createElement('div');
                 tableWrapper.className = 'table-wrapper';
                 tableWrapper.id = TABLE_CONTAINER_ID;
                 tableWrapper.tabIndex = 0;
+                if (detectedVars.length > 5) tableWrapper.classList.add('two-column-mode');
 
                 tableWrapper.addEventListener('paste', handlePaste);
 

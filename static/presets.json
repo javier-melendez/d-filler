@@ -1,0 +1,52 @@
+{
+  "ACTO_CUMPLIDO": [
+    { "value": "", "label": "Selecciona un valor..." },
+    {
+      "value": "Dando cumplimiento a lo ordenado en la Sentencia Escrita No.",
+      "label": "SENTENCIA ESCRITA"
+    },
+    {
+      "value": "Dando cumplimiento a lo ordenado en el Acta No.",
+      "label": "AUDIENCIA"
+    },
+    {
+      "value": "Dando cumplimiento al Auto de segunda instancia del",
+      "label": "SEGUNDA INSTANCIA"
+    }
+  ],
+  "TIPO_ACTO": [
+    { "value": "", "label": "Selecciona un valor..." },
+    { "value": "el acta", "label": "el acta" },
+    { "value": "la Sentencia Escrita", "label": "la Sentencia Escrita" },
+    { "value": "Auto de segunda instancia", "label": "Auto de segunda instancia" }
+  ],
+  "ENTIDAD": {
+    "type": "datalist",
+    "options": [
+      { "value": "", "label": "Selecciona un valor..." },
+      { "value": "esta Superintendencia", "label": "esta Superintendencia" },
+      { "value": "{{TRIBUNAL_O_JUZGADO}}", "label": "[Tribunal o juzgado]" }
+    ]
+  },
+  "NUMERO_ACTO_JUZGADO": {
+    "type": "text",
+    "label": "Numero de la sentencia, acta o nombre del juzgado",
+    "placeholder": "Escribe el número o nombre aquí"
+  },
+  "FIRMA": {
+    "type": "text",
+    "label": "Firma",
+    "value": "PEDRO ALEJANDRO NIÑO ROA"
+  },
+  "ELABORO": {
+    "type": "select",
+    "label": "Elaboró",
+    "options": [
+      { "value": "", "label": "Selecciona un valor..." },
+      { "value": "Elaboró: Laura López G.", "label": "Elaboró: Laura López G." },
+      { "value": "Elaboró: Isaac Torres", "label": "Elaboró: Isaac Torres" }
+    ],
+    "value": "Elaboró: Laura López G."
+  },
+  "FECHA_ACTO": ""
+}
